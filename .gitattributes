@@ -1,0 +1,2 @@
+# Preserve the original Workshop export byte-for-byte, including CRLF.
+widget.json -text whitespace=cr-at-eol

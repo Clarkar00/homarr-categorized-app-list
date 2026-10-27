@@ -1,0 +1,118 @@
+{
+  "$schema": "homarr-custom-widget-v2",
+  "name": "Categorized App List with Status Dots",
+  "description": "App link cards grouped into categories, each with a live status dot. Docker apps show container state (green running, red exited/dead, orange other); others can get an HTTP check (green up, orange 4xx/5xx, red 502-504 or unreachable, gray checking). Hover a dot for details. Order and grouping come from each app's description: NN-CATEGORY-NN (e.g. 02-MEDIA-01). Needs Homarr 2.0+, an admin API key and Docker set up in Homarr. Point the API source at your Homarr URL (not localhost).",
+  "sources": {
+    "default": {
+      "name": "Homarr API",
+      "baseUrl": "https://homarr.example.com",
+      "networkScope": "private",
+      "auth": {
+        "type": "apiKeyHeader",
+        "name": "ApiKey"
+      }
+    }
+  },
+  "requests": {
+    "apps": {
+      "source": "default",
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/apps",
+      "trigger": "load",
+      "auth": "inherit",
+      "permission": "view"
+    },
+    "containers": {
+      "source": "default",
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/trpc/docker.getContainers",
+      "trigger": "load",
+      "auth": "inherit",
+      "permission": "view"
+    },
+    "pings": {
+      "source": "default",
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/trpc/{param:procs}",
+      "trigger": "manual",
+      "query": {
+        "batch": "1",
+        "input": {
+          "$param": "input"
+        }
+      },
+      "auth": "inherit",
+      "permission": "view",
+      "cacheSeconds": 60
+    }
+  },
+  "options": {
+    "categoryRange": {
+      "label": "Categories to show",
+      "control": "select",
+      "default": "all",
+      "choices": [
+        {
+          "label": "All categories",
+          "value": "all"
+        },
+        {
+          "label": "Categories 1-3",
+          "value": "1-3"
+        },
+        {
+          "label": "Categories 4-6",
+          "value": "4-6"
+        },
+        {
+          "label": "Categories 1-4",
+          "value": "1-4"
+        },
+        {
+          "label": "Categories 5-99",
+          "value": "5-99"
+        },
+        {
+          "label": "Categories 7-99",
+          "value": "7-99"
+        },
+        {
+          "label": "Odd categories (1, 3, 5...)",
+          "value": "odd"
+        },
+        {
+          "label": "Even categories (2, 4, 6...)",
+          "value": "even"
+        }
+      ]
+    },
+    "pingFallback": {
+      "label": "HTTP check for apps without a container",
+      "description": "For apps with no matching Docker container, ping the app's ping URL (or link) through Homarr. All checks go out as one batched request (up to 24 apps), cached for 60 seconds. Off: those apps show no dot.",
+      "control": "switch",
+      "default": true
+    },
+    "showUncategorized": {
+      "label": "Show apps without a category",
+      "description": "Apps whose description is not NN-CATEGORY-NN go in an \"Other\" group at the bottom. They ignore \"Categories to show\", so if you split categories across several widgets, turn this on in only one. Off: those apps are hidden.",
+      "control": "switch",
+      "default": false
+    },
+    "containerOverrides": {
+      "label": "Container name overrides",
+      "description": "Only needed when a container name differs from the app name. Comma-separated app=container pairs, e.g. immich=immich-server, paperless=paperless-ngx. Case, spaces and dashes are ignored.",
+      "control": "text",
+      "default": ""
+    },
+    "fuzzyMatch": {
+      "label": "Fuzzy container matching",
+      "description": "Also match a container whose name is contained in the app name. Can give wrong matches (e.g. Plexamp to plex), so it is off by default. Prefer 'Container name overrides'.",
+      "control": "switch",
+      "default": false
+    }
+  },
+  "template": "<Stack gap=\"6px\" w=\"100%\">\n  {status.apps?.loading || status.containers?.loading ? (\n    <Skeleton height={200} radius=\"md\" />\n  ) : status.apps?.error ? (\n    <Alert color=\"red\" title=\"Could not load apps\">\n      <Text size=\"sm\">{status.apps.error}</Text>\n      <Text size=\"xs\" mt=\"xs\">\n        {\"Check that an API token is set (Management > Tools > AI & MCP > Authentication > Create API token), that it's added under the ApiKey header, and that the API source points at your Homarr URL, not localhost.\"}\n      </Text>\n    </Alert>\n  ) : (\n    [\n      {\n        containers: (data.containers?.result?.data?.json?.containers ?? []).map((c) => ({\n          key: (c.name ?? \"\").toLowerCase().replace(/[^a-z0-9]/g, \"\"),\n          state: c.state ?? \"\"\n        })),\n        overrides: (options.containerOverrides ?? \"\")\n          .split(\",\")\n          .map((pair) => pair.split(\"=\"))\n          .filter((pair) => pair.length === 2)\n          .map((pair) => ({\n            app: pair[0].toLowerCase().replace(/[^a-z0-9]/g, \"\"),\n            container: pair[1].toLowerCase().replace(/[^a-z0-9]/g, \"\")\n          })),\n        apps: (Array.isArray(data.apps) ? data.apps : [])\n          .map((app) => ({\n            ...app,\n            desc: (app.description ?? \"\").trim(),\n            nameKey: (app.name ?? \"\").toLowerCase().replace(/[^a-z0-9]/g, \"\")\n          }))\n          .map((app) => ({ ...app, first: app.desc.indexOf(\"-\"), last: app.desc.lastIndexOf(\"-\") }))\n          .map((app) => ({\n            ...app,\n            catNum: Number(app.desc.substring(0, app.first)),\n            catName: app.desc.substring(app.first + 1, app.last),\n            order: Number(app.desc.substring(app.last + 1))\n          }))\n          .map((app) => ({\n            ...app,\n            tagged:\n              app.first > 0 &&\n              app.last > app.first &&\n              app.desc.substring(app.last + 1) !== \"\" &&\n              !isNaN(app.catNum) &&\n              !isNaN(app.order)\n          }))\n          .filter((app) => app.tagged || options.showUncategorized)\n          .map((app) => (app.tagged ? app : { ...app, catNum: 9999, catName: \"Other\", order: 0 }))\n          .filter((app) =>\n            !app.tagged || options.categoryRange === \"all\" ? true\n            : options.categoryRange === \"odd\" ? app.catNum % 2 === 1\n            : options.categoryRange === \"even\" ? app.catNum % 2 === 0\n            : app.catNum >= Number((options.categoryRange ?? \"1-99\").split(\"-\")[0]) &&\n              app.catNum <= Number((options.categoryRange ?? \"1-99\").split(\"-\")[1])\n          )\n          .sort((a, b) =>\n            a.catNum - b.catNum ||\n            a.catName.localeCompare(b.catName) ||\n            a.order - b.order ||\n            (a.name ?? \"\").localeCompare(b.name ?? \"\")\n          )\n      }\n    ]\n      .map((ctx) => ({\n        ...ctx,\n        apps: ctx.apps.map((app) => ({\n          ...app,\n          containerKey: (ctx.overrides.find((o) => o.app === app.nameKey) ?? {}).container || app.nameKey\n        }))\n      }))\n      .map((ctx) => ({\n        ...ctx,\n        apps: ctx.apps.map((app) => ({\n          ...app,\n          state:\n            (ctx.containers.find((c) => c.key === app.containerKey) ?? {}).state ||\n            (options.fuzzyMatch\n              ? (ctx.containers\n                  .filter((c) => c.key.length >= 4 && app.containerKey.includes(c.key))\n                  .sort((a, b) => b.key.length - a.key.length)[0] ?? {}).state\n              : \"\") ||\n            \"\"\n        }))\n      }))\n      .map((ctx) => ({\n        ...ctx,\n        pingIds: options.pingFallback\n          ? ctx.apps.filter((app) => app.state === \"\").map((app) => app.id).slice(0, 24)\n          : []\n      }))\n      .map((ctx) => ({\n        ...ctx,\n        pingParams: {\n          procs: ctx.pingIds.map((id) => \"widget.app.ping\").join(\",\"),\n          input: \"{\" + ctx.pingIds.map((id, k) => \"\\\"\" + k + \"\\\":\" + JSON.stringify({ json: { id: id } })).join(\",\") + \"}\"\n        }\n      }))\n      .map((ctx) => (\n        <Stack key=\"list\" gap=\"6px\" w=\"100%\">\n          {status.containers?.error ? (\n            <Text size=\"xs\" c=\"dimmed\" ta=\"center\">\n              Docker status unavailable{options.pingFallback ? \", using HTTP checks\" : \"\"}.\n            </Text>\n          ) : null}\n          {ctx.apps.length === 0 ? (\n            <Text size=\"xs\" c=\"dimmed\" ta=\"center\" p=\"md\">\n              No apps matched. Set each app's description to NN-CATEGORY-NN, for example 02-MEDIA-01.\n            </Text>\n          ) : (\n            ctx.apps.map((app, i, arr) => (\n              <Stack key={app.id} gap=\"4px\">\n                {i === 0 || arr[i - 1].catNum !== app.catNum || arr[i - 1].catName !== app.catName ? (\n                  <Text fw={700} tt=\"uppercase\" c=\"dimmed\" fz=\"xs\" mt=\"10px\" mb=\"2px\" ta=\"center\">\n                    {app.catName}\n                  </Text>\n                ) : null}\n                <Anchor\n                  href={app.href}\n                  target=\"_blank\"\n                  underline=\"never\"\n                  c=\"inherit\"\n                  style={{\n                    display: \"flex\",\n                    alignItems: \"center\",\n                    gap: \"10px\",\n                    padding: \"8px 12px\",\n                    borderRadius: \"8px\",\n                    backgroundColor: \"light-dark(rgba(255, 255, 255, 0.85), rgba(18, 19, 23, 0.85))\",\n                    border: \"1px solid light-dark(rgba(0, 0, 0, 0.12), rgba(255, 255, 255, 0.14))\",\n                    boxShadow: \"0 1px 3px rgba(0, 0, 0, 0.25)\"\n                  }}\n                >\n                  <Group gap={0} wrap=\"nowrap\" align=\"flex-end\" style={{ flex: \"0 0 auto\" }}>\n                    <Image src={app.iconUrl} alt=\"\" w={20} h={20} fit=\"contain\" />\n                    {app.state !== \"\" || ctx.pingIds.includes(app.id) ? (\n                      <Box\n                        w={10}\n                        h={10}\n                        aria-hidden={app.state !== \"\" ? \"true\" : undefined}\n                        title={app.state !== \"\" ? \"Container \" + app.state : undefined}\n                        style={{\n                          flex: \"0 0 auto\",\n                          marginLeft: \"calc(-7px * var(--mantine-scale))\",\n                          marginBottom: \"calc(-3px * var(--mantine-scale))\",\n                          borderRadius: \"50%\",\n                          overflow: \"hidden\",\n                          border: \"calc(1.5px * var(--mantine-scale)) solid var(--mantine-color-body)\"\n                        }}\n                      >\n                        {app.state !== \"\" ? (\n                          <Box w=\"100%\" h=\"100%\" style={{ backgroundColor: app.state === \"running\" ? \"var(--mantine-color-green-6)\" : app.state === \"exited\" || app.state === \"dead\" ? \"var(--mantine-color-red-6)\" : \"var(--mantine-color-orange-6)\" }} />\n                        ) : (\n                          <SubFetch\n                            requestId=\"pings\"\n                            params={ctx.pingParams}\n                            fallback={<Box w=\"100%\" h=\"100%\" role=\"img\" aria-label=\"Checking\" title=\"Checking...\" style={{ backgroundColor: \"var(--mantine-color-gray-5)\" }} />}\n                            errorMessage=\"HTTP check failed\"\n                          >\n                            {(res) =>\n                              [Number(res?.[ctx.pingIds.indexOf(app.id)]?.result?.data?.json?.statusCode)].map((code) => (\n                                <Box\n                                  key=\"dot\"\n                                  w=\"100%\"\n                                  h=\"100%\"\n                                  role=\"img\"\n                                  aria-label={code >= 100 && code < 600 ? \"HTTP \" + code : \"Unreachable\"}\n                                  title={code >= 100 && code < 600 ? \"HTTP \" + code : \"Unreachable\"}\n                                  style={{\n                                    backgroundColor:\n                                      (code >= 200 && code < 400) || code === 401 || code === 403 ? \"var(--mantine-color-green-6)\"\n                                      : code >= 502 && code <= 504 ? \"var(--mantine-color-red-6)\"\n                                      : code >= 400 && code < 600 ? \"var(--mantine-color-orange-6)\"\n                                      : \"var(--mantine-color-red-6)\"\n                                  }}\n                                />\n                              ))\n                            }\n                          </SubFetch>\n                        )}\n                      </Box>\n                    ) : null}\n                  </Group>\n                  <Text size=\"sm\" fw={500} style={{ whiteSpace: \"nowrap\", overflow: \"hidden\", textOverflow: \"ellipsis\", minWidth: 0 }}>\n                    {app.name}\n                  </Text>\n                  {app.state !== \"\" ? <VisuallyHidden>{\"(container \" + app.state + \")\"}</VisuallyHidden> : null}\n                </Anchor>\n              </Stack>\n            ))\n          )}\n        </Stack>\n      ))\n  )}\n</Stack>\n"
+}

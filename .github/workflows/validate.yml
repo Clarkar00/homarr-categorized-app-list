@@ -1,0 +1,26 @@
+name: Validate public manifest
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Official action version tags; no unverified commit hashes.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test guardrail
+        run: python3 -m unittest discover -s tests -v
+      - name: Check public manifest
+        run: python3 scripts/check_public.py

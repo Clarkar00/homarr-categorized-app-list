@@ -1,0 +1,13 @@
+# Local exports, credentials, and private deployment configuration
+.env
+.env.*
+!.env.example
+*.local.json
+private/
+local/
+backups/
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+__pycache__/
