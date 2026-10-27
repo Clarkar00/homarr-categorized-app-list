@@ -4,9 +4,27 @@ App links grouped into categories, with Docker or HTTP status dots. Built for Ho
 
 **[Install from Homarr Workshop](https://homarr.dev/workshop/8y1z2nta8mutdx8)** · [Download the manifest](widget.json)
 
+## Screenshots
+
+The same three images shown on the Workshop listing, in the same order.
+
+### Dashboard example
+
+![Homarr dashboard with categorized app cards and existing privacy blur preserved](screenshots/dashboard.png)
+
+*Dashboard example from the Workshop listing. Existing privacy redactions are preserved; this is not a current service-status report.*
+
+### Status examples
+
+![Categorized app cards demonstrating green, orange, red, and gray status dots](screenshots/status-examples.png)
+
+*Illustrative apps and statuses, not live observations. See the status table below for the exact behavior.*
+
+### Setup
+
 ![Generic setup illustration showing a Radarr description tag and example grouped cards](screenshots/setup.png)
 
-*Setup illustration from the Workshop listing; example apps and statuses, not a live dashboard capture. See the status table below for the exact behavior.*
+*Tag app descriptions to control grouping and order.*
 
 ## Requirements
 
