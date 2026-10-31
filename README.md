@@ -11,7 +11,6 @@ App links grouped into categories, with Docker or HTTP status dots. Built for Ho
 
 ![Homarr dashboard with categorized app cards and existing privacy blur preserved](screenshots/dashboard.png)
 
-*Dashboard example from the Workshop listing. Existing privacy redactions are preserved; this is not a current service-status report.*
 
 ### Status examples
 
