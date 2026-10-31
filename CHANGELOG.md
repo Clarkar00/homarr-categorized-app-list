@@ -1,5 +1,13 @@
 # Changelog
 
+## Workshop revision 19
+
+- App tiles are now standard Homarr cards instead of hardcoded colors, so they follow board opacity, theme and custom CSS.
+- Added side and bottom padding so tiles no longer touch the widget edge.
+- Each tile has a `data-catlist-tile` attribute for custom CSS hover effects (example in the README). The widget sandbox blocks hover styles, so there is no built-in animation.
+
+Suggested by [@Lefky](https://github.com/Lefky) in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
+
 ## Workshop revision 18
 
 - New **Category columns** option: show categories side by side, up to 6 columns. Default is 1, so existing widgets look the same until you change it.

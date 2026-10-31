@@ -82,6 +82,21 @@ Hover a dot for details. HTTP green means reachable, not necessarily healthy or 
 
 App cards remain outside the HTTP request callback. A request-level batch failure uses Homarr's built-in error UI within the dot area, rather than a returned HTTP-code dot.
 
+## Styling and hover effect
+
+App tiles are standard Homarr cards, so they follow your board's opacity, theme colors and any custom CSS that targets cards.
+
+Homarr's widget sandbox does not allow hover styles, so there is no built-in hover animation. Each tile has a `data-catlist-tile` attribute you can target from **Board settings > Custom CSS**. For example:
+
+```css
+[data-catlist-tile]:hover > .mantine-Card-root {
+  transform: translateY(-2px);
+  border-color: var(--mantine-primary-color-filled);
+}
+```
+
+The tiles already have a short transition, so this animates smoothly.
+
 ## Requests and limits
 
 - Loads the app list from `/api/apps` and Docker state from `/api/trpc/docker.getContainers`.
@@ -115,7 +130,7 @@ GitHub is the source history and feedback channel; Workshop remains the installa
 
 ## Credits
 
-The category columns and save-space layout in revision 18 came from [@Lefky](https://github.com/Lefky)'s suggestion in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
+The category columns and save-space layout in revision 18, and the native tile styling and hover hook in revision 19, came from [@Lefky](https://github.com/Lefky)'s suggestions in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
 
 ## Feedback and license
 
