@@ -61,7 +61,9 @@ The first number controls category order; the text is the category label; the fi
 | HTTP check for apps without a container | On | Uses Homarr's ping URL, or the app link, for apps without a matching container. |
 | Show apps without a category | Off | Adds untagged apps to an Other group. Other ignores the category filter, so enable it in only one instance when splitting columns. |
 | Container name overrides | Empty | Comma-separated `app=container` pairs, e.g. `immich=immich-server`. Matching ignores case, spaces, and punctuation. |
-| Fuzzy container matching | Off | Allows partial matches. Can pick the wrong container; explicit overrides are safer. |
+| Fuzzy container matching | Off | Allows partial matches. Can pick the wrong container; explicit overrides are safer. Adds work per app, so on larger setups (about 40+ apps) it can hit Homarr's template limit. |
+| Category columns | 1 | Shows categories side by side, up to 6 columns. Empty columns are dropped, so you never get more columns than categories. Pick a number that fits your widget width; it does not adjust automatically. |
+| Save space | Off | With 2+ columns, puts each category in the shortest column so the widget stays as short as possible. Category order across columns can change. |
 
 ## Status dots
 
@@ -87,6 +89,7 @@ App cards remain outside the HTTP request callback. A request-level batch failur
 - If Docker status fails, a note is shown and HTTP fallback may check unmatched apps, subject to the same cap.
 - Caching is not the board refresh interval. Multiple widget instances can increase request volume.
 - Requests run through Homarr; this manifest contains no external telemetry endpoint.
+- Homarr limits how much work a widget template can do per render. Tested comfortably at about 50 apps with fuzzy matching off and about 40 with it on; much bigger lists can show a template-limit error. Splitting categories across several widget instances keeps each one smaller.
 
 ## Privacy
 
@@ -108,6 +111,10 @@ This repo starts with the exact public source from **Workshop revision 17**; no 
 6. Publish to Workshop after review, read back its saved source, and compare it with the committed manifest. Tag the matching commit `workshop-rN`.
 
 GitHub is the source history and feedback channel; Workshop remains the installation/discovery page. Nothing here automatically deploys to Homarr or publishes Workshop revisions.
+
+## Credits
+
+The category columns and save-space layout in revision 18 came from [@Lefky](https://github.com/Lefky)'s suggestion in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
 
 ## Feedback and license
 
