@@ -11,7 +11,9 @@ App links grouped into categories, with Docker or HTTP status dots. Built for Ho
 
 ![Homarr dashboard with categorized app cards](screenshots/dashboard.png)
 
+### Category columns with Save space enabled
 
+![Categorized app list using three columns with Save space enabled](screenshots/category-columns-save-space.png)
 
 ### Status examples
 
