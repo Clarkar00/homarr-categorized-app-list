@@ -9,7 +9,8 @@ App links grouped into categories, with Docker or HTTP status dots. Built for Ho
 
 ### Dashboard example
 
-![Homarr dashboard with categorized app cards (screenshots/dashboard.png)
+![Homarr dashboard with categorized app cards](screenshots/dashboard.png)
+
 
 
 ### Status examples
