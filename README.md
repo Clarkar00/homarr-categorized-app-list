@@ -6,7 +6,6 @@ App links grouped into categories, with Docker or HTTP status dots. Built for Ho
 
 ## Screenshots
 
-The same three images shown on the Workshop listing, in the same order.
 
 ### Dashboard example
 
