@@ -1,5 +1,14 @@
 # Changelog
 
+## Workshop revision 20
+
+- Added optional automatic category columns, so the layout adjusts as you resize the widget while keeping categories together. Auto uses browser-balanced, top-to-bottom flow, not masonry; large categories can leave whitespace.
+- Manual columns and Save space are still available. Auto is off by default, so existing layouts do not change unless you turn it on.
+- Removed the fixed-color ring around status dots so it does not stand out on transparent boards. Dot dimensions and placement are unchanged.
+- Existing template limits still apply. The 37-app/61-container test setup passed the enforced runtime limits across 24 option combinations; the heaviest manual/fuzzy combination has limited operation headroom, as it did in revision 19. Fuzzy matching remains best kept off unless needed.
+
+Automatic layout suggested by [@Lefky](https://github.com/Lefky) in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
+
 ## Workshop revision 19
 
 - App tiles are now standard Homarr cards instead of hardcoded colors, so they follow board opacity, theme and custom CSS.

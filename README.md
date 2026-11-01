@@ -63,8 +63,11 @@ The first number controls category order; the text is the category label; the fi
 | Show apps without a category | Off | Adds untagged apps to an Other group. Other ignores the category filter, so enable it in only one instance when splitting columns. |
 | Container name overrides | Empty | Comma-separated `app=container` pairs, e.g. `immich=immich-server`. Matching ignores case, spaces, and punctuation. |
 | Fuzzy container matching | Off | Allows partial matches. Can pick the wrong container; explicit overrides are safer. Adds work per app, so on larger setups (about 40+ apps) it can hit Homarr's template limit. |
-| Category columns | 1 | Shows categories side by side, up to 6 columns. Empty columns are dropped, so you never get more columns than categories. Pick a number that fits your widget width; it does not adjust automatically. |
-| Save space | Off | With 2+ columns, puts each category in the shortest column so the widget stays as short as possible. Category order across columns can change. |
+| Category columns | 1 | Manual mode: up to 6 columns. Empty columns are dropped, so you never get more columns than categories. Ignored when Automatic category columns is on. |
+| Save space | Off | Manual mode: with 2+ columns, assigns each category to the column with the lowest estimated height (header plus app count). Category order across columns can change. |
+| Automatic category columns | Off | Fits category columns to the widget's width as you resize it, with up to 6 columns. Keeps categories together and uses browser-balanced flow instead of manual placement. |
+
+Automatic category columns is opt-in, so existing layouts stay the same. It aims for about 200px per column, but a narrow widget can use a narrower single column. Categories read down each column, then across. This is not masonry; a large category can leave whitespace. Turn Auto off to use manual Category columns and Save space again.
 
 ## Status dots
 
@@ -130,7 +133,7 @@ GitHub is the source history and feedback channel; Workshop remains the installa
 
 ## Credits
 
-The category columns and save-space layout in revision 18, and the native tile styling and hover hook in revision 19, came from [@Lefky](https://github.com/Lefky)'s suggestions in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
+The category columns and save-space layout in revision 18, the native tile styling and hover hook in revision 19, and the automatic layout in revision 20 came from [@Lefky](https://github.com/Lefky)'s suggestions in [#1](https://github.com/Clarkar00/homarr-categorized-app-list/issues/1).
 
 ## Feedback and license
 
