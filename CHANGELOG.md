@@ -1,5 +1,11 @@
 # Changelog
 
+## Workshop revision 21
+
+Workshop listing only; no widget code changes.
+
+- Listing description now includes setup steps, including where to create the API token (Management > Tools > AI & MCP > Authentication > Create API token).
+
 ## Workshop revision 20
 
 - Added optional automatic category columns, so the layout adjusts as you resize the widget while keeping categories together. Auto uses browser-balanced, top-to-bottom flow, not masonry; large categories can leave whitespace.
