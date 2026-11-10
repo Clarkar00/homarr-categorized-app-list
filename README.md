@@ -52,7 +52,7 @@ For example:
 | Sonarr | `02-MEDIA-02` | MEDIA group, second app |
 | Docs | `03-TOOLS-01` | TOOLS group, first app |
 
-The first number controls category order; the text is the category label; the final number controls order within the category.
+The first number controls category order; the text is the category label; the final number controls order within the category. Category labels are matched ignoring letter case and surrounding spaces, so `02-Media-01` and `02-MEDIA-02` land in the same group.
 
 ## Options
 
@@ -104,7 +104,7 @@ The tiles already have a short transition, so this animates smoothly.
 
 - Loads the app list from `/api/apps` and Docker state from `/api/trpc/docker.getContainers`.
 - HTTP fallback uses Homarr's internal `widget.app.ping` procedure in one variable-length batch, cached for 60 seconds. Homarr's native app ping uses HEAD, so a service that rejects HEAD may show an error even when its page opens.
-- At most **24 unmatched apps per widget instance** receive HTTP checks; additional unmatched apps have no HTTP dot. Disabling fallback leaves unmatched apps without dots.
+- At most **24 unmatched apps per widget instance** receive HTTP checks; additional unmatched apps have no HTTP dot, and a note under the list says how many were not checked. Disabling fallback leaves unmatched apps without dots.
 - If Docker status fails, a note is shown and HTTP fallback may check unmatched apps, subject to the same cap.
 - Caching is not the board refresh interval. Multiple widget instances can increase request volume.
 - Requests run through Homarr; this manifest contains no external telemetry endpoint.

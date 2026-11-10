@@ -1,5 +1,11 @@
 # Changelog
 
+## Workshop revision 22
+
+- Categories now group together regardless of letter case or extra spaces, so `02-Media-01` and `02-MEDIA-02` share one MEDIA group instead of showing the header twice. Order numbers work across the merged group.
+- When more than 24 apps need an HTTP check, a note under the list now says how many were not checked. Before, those apps simply had no dot.
+- No option or layout changes. Existing setups look the same unless they were affected by one of the two issues above.
+
 ## Workshop revision 21
 
 Workshop listing only; no widget code changes.
